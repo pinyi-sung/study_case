@@ -232,7 +232,13 @@
     animation:pop .3s ease;
   }
   @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
-  #weakList li .del{margin-left:auto;color:var(--red);cursor:pointer;font-weight:900;border:none;background:none;font-size:16px}
+  #weakList li .weak-date{
+    font-family:'Bebas Neue';letter-spacing:1px;font-size:13px;
+    background:var(--ink);color:var(--gold);
+    padding:2px 8px;border-radius:8px;flex:none;
+  }
+  #weakList li .weak-text{flex:1;word-break:break-word}
+  #weakList li .del{margin-left:auto;color:var(--red);cursor:pointer;font-weight:900;border:none;background:none;font-size:16px;flex:none}
   .empty-hint{font-size:12.5px;color:#9a927c;text-align:center;padding:14px}
 
   /* ---------- footer 印章 ---------- */
@@ -464,13 +470,31 @@
   function saveWeak(){ store.set(KEY_WEAK, JSON.stringify(weakData)); }
   function refreshEmpty(){ empty.style.display = weakData.length ? 'none' : 'block'; }
 
+  // 顯示用日期：例 07/27（三）
+  function fmtDate(iso){
+    const d = new Date(iso + 'T00:00:00');
+    if(isNaN(d)) return iso;
+    const wk = ['日','一','二','三','四','五','六'][d.getDay()];
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${mm}/${dd}（${wk}）`;
+  }
+
   function renderWeak(){
     list.innerHTML = '';
-    weakData.forEach((text, idx) => {
+    weakData.forEach((item, idx) => {
       const li = document.createElement('li');
+
+      const date = document.createElement('span');
+      date.className = 'weak-date';
+      date.textContent = fmtDate(item.date);
+
       const span = document.createElement('span');
-      span.textContent = text;
-      li.append(document.createTextNode('🔎 '), span);
+      span.className = 'weak-text';
+      span.textContent = item.text;
+
+      li.append(document.createTextNode('🔎 '), date, span);
+
       const del = document.createElement('button');
       del.className = 'del';
       del.textContent = '✕';
@@ -486,12 +510,18 @@
   function addWeak(){
     const v = input.value.trim();
     if(!v) return;
-    weakData.push(v);
+    weakData.push({ text: v, date: todayStr() });
     saveWeak(); renderWeak();
     input.value = '';
   }
   function loadWeak(){
-    try{ const raw = store.get(KEY_WEAK); if(raw) weakData = JSON.parse(raw) || []; }catch(e){ weakData = []; }
+    try{
+      const raw = store.get(KEY_WEAK);
+      if(!raw){ weakData = []; return; }
+      const arr = JSON.parse(raw) || [];
+      // 向下相容：舊版存的是純字串，補上日期欄位
+      weakData = arr.map(x => typeof x === 'string' ? { text: x, date: todayStr() } : x);
+    }catch(e){ weakData = []; }
   }
   addBtn.addEventListener('click', addWeak);
   input.addEventListener('keydown', e => { if(e.key === 'Enter') addWeak(); });

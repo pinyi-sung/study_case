@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>品頤の推理讀書事件簿</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Bebas+Neue&display=swap');
+
+  :root{
+    --ink:#0d1b3e;          /* 柯南深藍 */
+    --ink-2:#16265a;
+    --paper:#f6f1e4;        /* 案卷紙色 */
+    --paper-2:# efe7d3;
+    --red:#c0132b;          /* 領結變聲器紅 */
+    --red-soft:#e23a52;
+    --gold:#e8b53a;         /* 放大鏡金 */
+    --blue:#2b6fd6;
+    --mint:#2fb08a;
+    --line:#c9bfa3;
+    --shadow: rgba(13,27,62,.18);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Zen Maru Gothic', system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(232,181,58,.10), transparent 40%),
+      radial-gradient(circle at 88% 92%, rgba(43,111,214,.10), transparent 42%),
+      var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    padding:20px 14px 80px;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:26px;
+    padding:34px 26px 30px;
+    overflow:hidden;
+    box-shadow:0 18px 40px var(--shadow);
+    border:3px solid var(--ink-2);
+  }
+  .hero::before{ /* 放大鏡光圈 */
+    content:"";
+    position:absolute; right:-60px; top:-60px;
+    width:220px;height:220px;border-radius:50%;
+    border:14px solid rgba(232,181,58,.25);
+    box-shadow:0 0 0 30px rgba(232,181,58,.06);
+  }
+  .hero::after{
+    content:"";
+    position:absolute; right:70px; top:150px;
+    width:120px;height:22px;border-radius:20px;
+    background:var(--gold);opacity:.35;
+    transform:rotate(45deg);
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--red);color:#fff;
+    font-size:12px;letter-spacing:2px;font-weight:700;
+    padding:6px 14px;border-radius:30px;margin-bottom:14px;
+  }
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:blink 1.3s infinite}
+  @keyframes blink{50%{opacity:.2}}
+  .hero h1{
+    font-size:30px;font-weight:900;line-height:1.25;position:relative;z-index:2;
+  }
+  .hero h1 .hl{color:var(--gold)}
+  .hero .sub{margin-top:10px;font-size:14px;opacity:.85;max-width:80%;position:relative;z-index:2}
+  .case-no{
+    margin-top:18px;font-family:'Bebas Neue';letter-spacing:3px;
+    font-size:15px;color:var(--gold);border-top:1px dashed rgba(255,255,255,.2);
+    padding-top:12px;
+  }
+
+  /* ---------- 名言 ---------- */
+  .quote{
+    background:var(--paper-2);
+    border-left:6px solid var(--red);
+    border-radius:0 16px 16px 0;
+    padding:16px 20px;margin:22px 0;
+    font-weight:700;font-size:15px;position:relative;
+  }
+  .quote span{color:var(--red)}
+
+  /* ---------- 進度總覽 ---------- */
+  .progress-card{
+    background:#fff;border:2px solid var(--line);border-radius:20px;
+    padding:20px;margin:22px 0;box-shadow:0 6px 18px var(--shadow);
+  }
+  .pc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .pc-top b{font-size:16px}
+  .pc-top .pct{font-family:'Bebas Neue';font-size:34px;color:var(--red);line-height:1}
+  .bar{height:16px;background:var(--paper-2);border-radius:20px;overflow:hidden;border:1px solid var(--line)}
+  .bar > i{
+    display:block;height:100%;width:0;border-radius:20px;
+    background:linear-gradient(90deg,var(--gold),var(--red));
+    transition:width .8s cubic-bezier(.4,1.3,.5,1);
+  }
+  .pc-hint{font-size:12.5px;color:#6b6350;margin-top:10px}
+
+  /* ---------- 分段標題 ---------- */
+  .sec-title{
+    display:flex;align-items:center;gap:12px;
+    margin:34px 0 16px;
+  }
+  .sec-title .mag{
+    width:38px;height:38px;flex:none;position:relative;
+  }
+  .sec-title .mag::before{
+    content:"";position:absolute;width:24px;height:24px;border-radius:50%;
+    border:4px solid var(--ink);
+  }
+  .sec-title .mag::after{
+    content:"";position:absolute;width:12px;height:4px;background:var(--ink);
+    border-radius:4px;right:0;bottom:2px;transform:rotate(45deg);
+  }
+  .sec-title h2{font-size:20px;font-weight:900}
+  .sec-title small{display:block;font-size:12px;color:#8a8069;font-weight:500}
+
+  /* ---------- 每日任務 checklist ---------- */
+  .daily{
+    background:#fff;border:2px solid var(--line);border-radius:20px;padding:8px 6px;
+    box-shadow:0 6px 18px var(--shadow);
+  }
+  .task{
+    display:flex;align-items:flex-start;gap:14px;
+    padding:14px 16px;border-radius:14px;cursor:pointer;
+    transition:background .2s;user-select:none;
+  }
+  .task:hover{background:var(--paper-2)}
+  .task + .task{border-top:1px dashed var(--line)}
+  .check{
+    width:26px;height:26px;flex:none;border-radius:8px;
+    border:2.5px solid var(--red);background:#fff;position:relative;transition:.2s;margin-top:2px;
+  }
+  .task.done .check{background:var(--red);border-color:var(--red)}
+  .task.done .check::after{
+    content:"✓";position:absolute;inset:0;color:#fff;font-weight:900;
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+  }
+  .task .t-body b{font-size:15.5px;display:block}
+  .task.done .t-body b{text-decoration:line-through;color:#9a927c}
+  .task .t-body p{font-size:12.5px;color:#7a7160}
+  .tag{
+    font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;margin-left:6px;
+    vertical-align:middle;white-space:nowrap;
+  }
+  .tag.math{background:#e9f0fc;color:var(--blue)}
+  .tag.core{background:#fdeef0;color:var(--red)}
+  .tag.check{background:#e6f6f0;color:var(--mint)}
+
+  /* ---------- 反向推導互動 ---------- */
+  .deduce{
+    background:var(--ink);color:var(--paper);border-radius:22px;padding:24px 22px;
+    box-shadow:0 12px 30px var(--shadow);
+  }
+  .deduce h3{font-size:17px;color:var(--gold);margin-bottom:4px}
+  .deduce .lead{font-size:13px;opacity:.85;margin-bottom:18px}
+  .steps{display:flex;flex-direction:column;gap:10px}
+  .step{
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;padding:14px 16px;cursor:pointer;transition:.25s;
+  }
+  .step:hover{background:rgba(255,255,255,.12)}
+  .step-head{display:flex;align-items:center;gap:12px;font-weight:700;font-size:14.5px}
+  .step-head .n{
+    width:28px;height:28px;flex:none;border-radius:50%;background:var(--gold);color:var(--ink);
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-family:'Bebas Neue';font-size:17px;
+  }
+  .step-body{max-height:0;overflow:hidden;transition:max-height .35s ease;font-size:13px;opacity:.9}
+  .step.open .step-body{max-height:200px;margin-top:10px}
+  .step .arrow{margin-left:auto;transition:.3s;color:var(--gold)}
+  .step.open .arrow{transform:rotate(90deg)}
+
+  /* ---------- 診斷分岔 ---------- */
+  .verdict{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .verdict .v{
+    border-radius:16px;padding:16px;text-align:center;
+  }
+  .v.can{background:#e6f6f0;border:2px solid var(--mint)}
+  .v.cant{background:#fdeef0;border:2px solid var(--red)}
+  .v .ico{font-size:26px}
+  .v b{display:block;margin:6px 0 4px;font-size:15px}
+  .v.can b{color:var(--mint)}
+  .v.cant b{color:var(--red)}
+  .v p{font-size:12px;color:#6b6350}
+
+  /* ---------- 每週檢核 ---------- */
+  .weekly{
+    background:#fff;border:2px solid var(--line);border-radius:20px;padding:20px;
+    box-shadow:0 6px 18px var(--shadow);
+  }
+  .wk-item{display:flex;gap:12px;padding:12px 0;align-items:flex-start}
+  .wk-item + .wk-item{border-top:1px dashed var(--line)}
+  .wk-item .k{
+    font-family:'Bebas Neue';font-size:20px;color:var(--gold);
+    width:34px;flex:none;text-align:center;
+  }
+  .wk-item b{font-size:14.5px}
+  .wk-item p{font-size:12.5px;color:#7a7160}
+
+  /* ---------- 弱點清單輸入 ---------- */
+  .weakbox{
+    background:var(--paper-2);border:2px dashed var(--red);border-radius:18px;
+    padding:18px;margin-top:16px;
+  }
+  .weakbox h4{font-size:15px;color:var(--red);margin-bottom:4px}
+  .weakbox p{font-size:12px;color:#7a7160;margin-bottom:12px}
+  .weak-input{display:flex;gap:8px}
+  .weak-input input{
+    flex:1;border:2px solid var(--line);border-radius:12px;padding:10px 12px;
+    font-family:inherit;font-size:14px;background:#fff;
+  }
+  .weak-input input:focus{outline:none;border-color:var(--red)}
+  .weak-input button{
+    background:var(--red);color:#fff;border:none;border-radius:12px;
+    padding:0 18px;font-weight:700;font-family:inherit;cursor:pointer;font-size:14px;transition:.2s;
+  }
+  .weak-input button:hover{background:var(--red-soft)}
+  #weakList{list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:8px}
+  #weakList li{
+    background:#fff;border-radius:12px;padding:10px 14px;display:flex;
+    align-items:center;gap:10px;font-size:14px;border-left:4px solid var(--gold);
+    animation:pop .3s ease;
+  }
+  @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  #weakList li .del{margin-left:auto;color:var(--red);cursor:pointer;font-weight:900;border:none;background:none;font-size:16px}
+  .empty-hint{font-size:12.5px;color:#9a927c;text-align:center;padding:14px}
+
+  /* ---------- footer 印章 ---------- */
+  .stamp{
+    text-align:center;margin-top:40px;color:#9a927c;font-size:12px;
+  }
+  .stamp .seal{
+    display:inline-block;border:3px solid var(--red);color:var(--red);
+    border-radius:50%;width:96px;height:96px;line-height:1.2;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-weight:900;margin:0 auto 12px;transform:rotate(-8deg);opacity:.85;
+    font-size:13px;
+  }
+  .reset{
+    background:none;border:1.5px solid var(--line);color:#8a8069;border-radius:20px;
+    padding:8px 18px;font-family:inherit;font-size:12.5px;cursor:pointer;margin-top:10px;
+  }
+  .reset:hover{border-color:var(--red);color:var(--red)}
+
+  @media(max-width:480px){
+    .hero h1{font-size:24px}
+    .hero .sub{max-width:100%}
+    .verdict{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="badge"><span class="dot"></span>CASE FILE · 進行中</div>
+    <h1>品頤の<span class="hl">推理讀書</span>事件簿<br>本週偵查任務</h1>
+    <p class="sub">真相永遠只有一個 —— 弱點只要被鎖定，就一定能被破解。跟著傑安老師的策略，一步步推理出你的高分結局。</p>
+    <div class="case-no">目標積分 33.8 · 試行期 5～7 天 · 下週約談回報</div>
+  </header>
+
+  <div class="quote">「不要在數學弱項上盲目虛耗時間 —— <span>用每日基礎維持手感，先穩住強項，最後一個月再全力衝刺。</span>」</div>
+
+  <!-- 進度總覽 -->
+  <div class="progress-card">
+    <div class="pc-top">
+      <b>🔍 今日破案進度</b>
+      <span class="pct" id="pctText">0%</span>
+    </div>
+    <div class="bar"><i id="progBar"></i></div>
+    <p class="pc-hint" id="progHint">完成每日任務，看著進度條像放大鏡一樣把真相照亮。</p>
+  </div>
+
+  <!-- 每日任務 -->
+  <div class="sec-title">
+    <div class="mag"></div>
+    <div><h2>每日搜查任務</h2><small>DAILY · 點一下打勾，維持手感不中斷</small></div>
+  </div>
+
+  <div class="daily" id="dailyList">
+    <div class="task" data-t>
+      <div class="check"></div>
+      <div class="t-body"><b>數學 3～5 題<span class="tag math">維持手感</span></b>
+      <p>不用多，但要每天做。做完立刻進行「反向推導訂正」。</p></div>
+    </div>
+    <div class="task" data-t>
+      <div class="check"></div>
+      <div class="t-body"><b>全力拉提強項科<span class="tag core">英文 / 社會</span></b>
+      <p>把省下的數學時間投進「看得懂、聽得進」的科目，先衝 A++。</p></div>
+    </div>
+    <div class="task" data-t>
+      <div class="check"></div>
+      <div class="t-body"><b>錯題反向推導<span class="tag check">深度訂正</span></b>
+      <p>錯的算式 vs 正確邏輯並排比較，找出卡關的那一步。</p></div>
+    </div>
+    <div class="task" data-t>
+      <div class="check"></div>
+      <div class="t-body"><b>標記「推不出來」的題<span class="tag check">建弱點清單</span></b>
+      <p>看著答案也推不出 → 立刻標註，別再獨自消耗，留給老師/家教。</p></div>
+    </div>
+  </div>
+
+  <!-- 反向推導 -->
+  <div class="sec-title">
+    <div class="mag"></div>
+    <div><h2>反向推導訂正法</h2><small>DEDUCTION · 像柯南一樣，從結果回推真相</small></div>
+  </div>
+
+  <div class="deduce">
+    <h3>🕵️ 由「答案」反推「過程」</h3>
+    <p class="lead">訂正不是抄答案。既然已知結果，就從答案反推：要得到它，中間該有什麼推導？點開每一步看做法。</p>
+    <div class="steps" id="deduceSteps">
+      <div class="step">
+        <div class="step-head"><span class="n">1</span>錯誤與正確並排<span class="arrow">▸</span></div>
+        <div class="step-body">把出錯的題貼在筆記本，一側寫下當時錯誤的算式，另一側用已知答案來推導。</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="n">2</span>由答案反推邏輯<span class="arrow">▸</span></div>
+        <div class="step-body">問自己：「要得到這個答案，中間應該具備什麼推導過程？」把邏輯一步步連貫起來。</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="n">3</span>鎖定卡關點<span class="arrow">▸</span></div>
+        <div class="step-body">比較「反推出的正確邏輯」與「原本錯誤算式」，找出你到底卡在哪一步、思考在哪偏差。</div>
+      </div>
+    </div>
+
+    <div class="verdict">
+      <div class="v can">
+        <div class="ico">💡</div>
+        <b>推得出來</b>
+        <p>只是失誤或某個轉折沒想到 → 記住這個關鍵轉折即可。</p>
+      </div>
+      <div class="v cant">
+        <div class="ico">🚨</div>
+        <b>推不出來</b>
+        <p>核心觀念完全陌生 → 停止摸索，標記下來找老師/家教帶領理解。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弱點清單 -->
+  <div class="sec-title">
+    <div class="mag"></div>
+    <div><h2>弱點嫌犯清單</h2><small>SUSPECTS · 推不出來的題／章節，記下來交給老師</small></div>
+  </div>
+
+  <div class="weakbox">
+    <h4>📌 登記今日的「破不了的案」</h4>
+    <p>透過模考、禮拜考、每日練習讓弱點「噴」出來。累積起來，下週約談一次帶去問。</p>
+    <div class="weak-input">
+      <input id="weakInput" type="text" placeholder="例：二次函數頂點 / 相似三角形…" />
+      <button id="weakAdd">登記</button>
+    </div>
+    <ul id="weakList"></ul>
+    <p class="empty-hint" id="weakEmpty">目前清單是空的 —— 有推不出來的題就登記進來。</p>
+  </div>
+
+  <!-- 每週檢核 -->
+  <div class="sec-title">
+    <div class="mag"></div>
+    <div><h2>每週結案報告</h2><small>WEEKLY · 下週約談前，這樣檢查自己</small></div>
+  </div>
+
+  <div class="weekly">
+    <div class="wk-item"><span class="k">A</span><div><b>強項達標了嗎？</b><p>英文、社會在模考／禮拜考是否穩定往 A++ 靠近，撐起 33.8 總積分。</p></div></div>
+    <div class="wk-item"><span class="k">B</span><div><b>新節奏順嗎？</b><p>每天 3～5 題數學能穩定執行、不佔太多時間，省下的時間有真的投進強項嗎？</p></div></div>
+    <div class="wk-item"><span class="k">C</span><div><b>弱點顯現了嗎？</b><p>這週有沒有清楚識別出哪些章節是「看著答案也推不出來」的盲點。</p></div></div>
+    <div class="wk-item"><span class="k">D</span><div><b>問題彙整了嗎？</b><p>把無法反向推導的題整理成清單，準備交給老師或家教帶領理解。</p></div></div>
+    <div class="wk-item"><span class="k">E</span><div><b>發現新任務了嗎？</b><p>試行後會冒出「新任務」—— 下週約談回報，再一起調整策略。</p></div></div>
+  </div>
+
+  <!-- footer -->
+  <div class="stamp">
+    <div class="seal">CASE<br>ON-GOING<br>品頤</div>
+    偵探事務所 · 傑安老師策略監修 · 1150725
+    <br>
+    <button class="reset" id="resetBtn">🔄 重置本週進度</button>
+  </div>
+
+</div>
+
+<script>
+  /* ---- 每日任務打勾 ---- */
+  const tasks = document.querySelectorAll('.task[data-t]');
+  const bar = document.getElementById('progBar');
+  const pctText = document.getElementById('pctText');
+  const hint = document.getElementById('progHint');
+  const hints = [
+    "完成每日任務，看著進度條像放大鏡一樣把真相照亮。",
+    "好的開始！繼續搜查下一條線索。",
+    "一半了，手感正在回來。",
+    "剩最後一步，真相即將揭曉！",
+    "🎉 全部破案！今日任務完美結案，明天再戰。"
+  ];
+
+  function updateProgress(){
+    const done = document.querySelectorAll('.task.done').length;
+    const pct = Math.round(done / tasks.length * 100);
+    bar.style.width = pct + '%';
+    pctText.textContent = pct + '%';
+    hint.textContent = hints[done] || hints[0];
+  }
+  tasks.forEach(t => t.addEventListener('click', () => {
+    t.classList.toggle('done');
+    updateProgress();
+  }));
+
+  /* ---- 反向推導手風琴 ---- */
+  document.querySelectorAll('#deduceSteps .step').forEach(s => {
+    s.addEventListener('click', () => s.classList.toggle('open'));
+  });
+
+  /* ---- 弱點清單 ---- */
+  const input = document.getElementById('weakInput');
+  const addBtn = document.getElementById('weakAdd');
+  const list = document.getElementById('weakList');
+  const empty = document.getElementById('weakEmpty');
+
+  function refreshEmpty(){
+    empty.style.display = list.children.length ? 'none' : 'block';
+  }
+  function addWeak(){
+    const v = input.value.trim();
+    if(!v) return;
+    const li = document.createElement('li');
+    li.innerHTML = '🔎 <span>'+ v.replace(/</g,'&lt;') +'</span><button class="del">✕</button>';
+    li.querySelector('.del').addEventListener('click', () => { li.remove(); refreshEmpty(); });
+    list.appendChild(li);
+    input.value = '';
+    refreshEmpty();
+  }
+  addBtn.addEventListener('click', addWeak);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') addWeak(); });
+
+  /* ---- 重置 ---- */
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    tasks.forEach(t => t.classList.remove('done'));
+    list.innerHTML = '';
+    refreshEmpty();
+    updateProgress();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  updateProgress();
+  refreshEmpty();
+</script>
+</body>
+</html>

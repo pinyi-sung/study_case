@@ -391,8 +391,27 @@
 </div>
 
 <script>
+  /* ============================================================
+     儲存機制說明：
+     使用 localStorage。在 Claude 預覽視窗中會被沙盒擋掉（不會存），
+     但一旦把這個 HTML 上傳到 GitHub Pages 或任何真正的網站，
+     開啟後登記的資料就會被記住（同一台裝置、同一個瀏覽器）。
+     - 弱點清單：長期保留
+     - 每日任務打勾：每天自動重置（換一天歸零，維持每日打卡意義）
+     localStorage 不可用時自動退回記憶體模式，功能照常運作。
+     ============================================================ */
+  const KEY_WEAK  = 'pinyi_weak_list_v1';
+  const KEY_DAILY = 'pinyi_daily_v1';
+
+  // 安全包裝：localStorage 被擋時不報錯
+  const store = {
+    get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  };
+  const todayStr = () => new Date().toLocaleDateString('sv');  // YYYY-MM-DD
+
   /* ---- 每日任務打勾 ---- */
-  const tasks = document.querySelectorAll('.task[data-t]');
+  const tasks = Array.from(document.querySelectorAll('.task[data-t]'));
   const bar = document.getElementById('progBar');
   const pctText = document.getElementById('pctText');
   const hint = document.getElementById('progHint');
@@ -404,8 +423,21 @@
     "🎉 全部破案！今日任務完美結案，明天再戰。"
   ];
 
+  function saveDaily(){
+    const state = tasks.map(t => t.classList.contains('done'));
+    store.set(KEY_DAILY, JSON.stringify({ date: todayStr(), state }));
+  }
+  function loadDaily(){
+    try{
+      const raw = store.get(KEY_DAILY);
+      if(!raw) return;
+      const obj = JSON.parse(raw);
+      if(obj.date !== todayStr()) return;   // 換一天 → 不套用，等於重置
+      obj.state.forEach((done, i) => { if(done && tasks[i]) tasks[i].classList.add('done'); });
+    }catch(e){}
+  }
   function updateProgress(){
-    const done = document.querySelectorAll('.task.done').length;
+    const done = tasks.filter(t => t.classList.contains('done')).length;
     const pct = Math.round(done / tasks.length * 100);
     bar.style.width = pct + '%';
     pctText.textContent = pct + '%';
@@ -414,6 +446,7 @@
   tasks.forEach(t => t.addEventListener('click', () => {
     t.classList.toggle('done');
     updateProgress();
+    saveDaily();
   }));
 
   /* ---- 反向推導手風琴 ---- */
@@ -426,34 +459,57 @@
   const addBtn = document.getElementById('weakAdd');
   const list = document.getElementById('weakList');
   const empty = document.getElementById('weakEmpty');
+  let weakData = [];
 
-  function refreshEmpty(){
-    empty.style.display = list.children.length ? 'none' : 'block';
+  function saveWeak(){ store.set(KEY_WEAK, JSON.stringify(weakData)); }
+  function refreshEmpty(){ empty.style.display = weakData.length ? 'none' : 'block'; }
+
+  function renderWeak(){
+    list.innerHTML = '';
+    weakData.forEach((text, idx) => {
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = text;
+      li.append(document.createTextNode('🔎 '), span);
+      const del = document.createElement('button');
+      del.className = 'del';
+      del.textContent = '✕';
+      del.addEventListener('click', () => {
+        weakData.splice(idx, 1);
+        saveWeak(); renderWeak();
+      });
+      li.appendChild(del);
+      list.appendChild(li);
+    });
+    refreshEmpty();
   }
   function addWeak(){
     const v = input.value.trim();
     if(!v) return;
-    const li = document.createElement('li');
-    li.innerHTML = '🔎 <span>'+ v.replace(/</g,'&lt;') +'</span><button class="del">✕</button>';
-    li.querySelector('.del').addEventListener('click', () => { li.remove(); refreshEmpty(); });
-    list.appendChild(li);
+    weakData.push(v);
+    saveWeak(); renderWeak();
     input.value = '';
-    refreshEmpty();
+  }
+  function loadWeak(){
+    try{ const raw = store.get(KEY_WEAK); if(raw) weakData = JSON.parse(raw) || []; }catch(e){ weakData = []; }
   }
   addBtn.addEventListener('click', addWeak);
   input.addEventListener('keydown', e => { if(e.key === 'Enter') addWeak(); });
 
-  /* ---- 重置 ---- */
+  /* ---- 重置（只清今日打卡，弱點清單保留；問一次要不要一起清） ---- */
   document.getElementById('resetBtn').addEventListener('click', () => {
     tasks.forEach(t => t.classList.remove('done'));
-    list.innerHTML = '';
-    refreshEmpty();
+    saveDaily();
     updateProgress();
+    if(weakData.length && confirm('要順便清空「弱點嫌犯清單」嗎？\n\n按「確定」＝連弱點清單一起清空\n按「取消」＝只重置今日打卡，弱點清單保留')){
+      weakData = []; saveWeak(); renderWeak();
+    }
     window.scrollTo({top:0, behavior:'smooth'});
   });
 
-  updateProgress();
-  refreshEmpty();
+  /* ---- 初始化 ---- */
+  loadWeak();  renderWeak();
+  loadDaily(); updateProgress();
 </script>
 </body>
 </html>
